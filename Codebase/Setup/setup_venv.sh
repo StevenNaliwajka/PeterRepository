@@ -30,11 +30,14 @@ if ! command -v pip3 >/dev/null 2>&1; then
   $SUDO $APT_CMD python3-pip
 fi
 
-# Install version-specific venv package if needed
+# Ensure version-specific venv is installed
+$SUDO $APT_CMD python${PY_VER}-venv >/dev/null 2>&1
 if ! python3 -m venv --help >/dev/null 2>&1; then
-  echo "venv not working — installing python${PY_VER}-venv..."
-  $SUDO $APT_CMD python${PY_VER}-venv
+  echo "Failed to install python${PY_VER}-venv or venv is still broken."
+  echo "Try manually running: apt install python${PY_VER}-venv"
+  exit 1
 fi
+
 
 # Recreate virtual environment
 if [ -d "$VENV_DIR" ]; then
