@@ -2,31 +2,37 @@
 
 echo "Setting up Python virtual environment..."
 
-# Resolve paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR/../.."
+PROJECT_ROOT="$(realpath "$SCRIPT_DIR/../..")"
 VENV_DIR="$PROJECT_ROOT/.venv"
 REQUIREMENTS_FILE="$SCRIPT_DIR/requirements.txt"
 
-# Check for python3
+APT_CMD="apt install -y"
+
+# Only use sudo if not root
+if [ "$(id -u)" -ne 0 ]; then
+  APT_CMD="sudo $APT_CMD"
+fi
+
+# Check and install python3
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "Python3 is not installed. Installing..."
-  sudo apt update && sudo apt install -y python3
+  echo "python3 not found, installing..."
+  apt update && $APT_CMD python3
 fi
 
-# Check for python3-venv
+# Check and install python3-venv
 if ! python3 -m venv --help >/dev/null 2>&1; then
-  echo "python3-venv is not installed. Installing..."
-  sudo apt install -y python3-venv
+  echo "python3-venv not found, installing..."
+  $APT_CMD python3-venv
 fi
 
-# Check for pip
+# Check and install pip3
 if ! command -v pip3 >/dev/null 2>&1; then
-  echo "pip3 is not installed. Installing..."
-  sudo apt install -y python3-pip
+  echo "pip3 not found, installing..."
+  $APT_CMD python3-pip
 fi
 
-# Create venv
+# Create virtual environment
 if [ ! -d "$VENV_DIR" ]; then
   echo "Creating virtual environment at: $VENV_DIR"
   python3 -m venv "$VENV_DIR"
@@ -40,14 +46,17 @@ if [ -f "$VENV_DIR/bin/activate" ]; then
   source "$VENV_DIR/bin/activate"
 
   if [ -f "$REQUIREMENTS_FILE" ]; then
-    echo "Installing requirements from $REQUIREMENTS_FILE"
+    echo "Installing packages from $REQUIREMENTS_FILE"
     pip install --upgrade pip
     pip install -r "$REQUIREMENTS_FILE"
-    echo "Dependencies installed."
+    echo "Done."
   else
     echo "No requirements.txt found at: $REQUIREMENTS_FILE"
   fi
 else
   echo "Error: activate script not found in $VENV_DIR"
+  echo "You likely need to reinstall python3-venv and recreate the venv:"
+  echo "    apt install python3-venv"
+  echo "    python3 -m venv .venv"
   exit 1
 fi
