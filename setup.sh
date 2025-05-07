@@ -42,13 +42,18 @@ After=network.target
 
 [Service]
 Type=simple
-User=$CURRENT_USER
-WorkingDirectory=$WORKING_DIR
-ExecStart=/bin/bash $RUN_SCRIPT
+User=root
+WorkingDirectory=/root/PeterRepository
+ExecStart=/bin/bash /root/PeterRepository/run.sh
 Restart=always
+RestartSec=3
+StandardOutput=append:/var/log/peter.log
+StandardError=append:/var/log/peter.err
+Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target
+
 EOF
 
     $SUDO systemctl daemon-reload
