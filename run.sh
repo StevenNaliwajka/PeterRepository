@@ -1,10 +1,6 @@
 #!/bin/bash
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$SCRIPT_DIR/Codebase"
-APP_MODULE="main:app"
-PID_FILE="$REPO_DIR/FastAPIapp/fastapi_api.pid"
-
 # Determine the project root
 PROJECT_ROOT="$(cd "$SCRIPT_DIR" && pwd)"
 echo "project root $PROJECT_ROOT"
@@ -13,6 +9,10 @@ echo "project root $PROJECT_ROOT"
 VENV_DIR="$PROJECT_ROOT/.venv"
 # Activate virtual environment
 source "$VENV_DIR/bin/activate"
+APP_MODULE="main:app"
+PID_FILE="$REPO_DIR/FastAPIapp/fastapi_api.pid"
+
+
 
 cd "$REPO_DIR"
 export PYTHONPATH="$REPO_DIR:$PYTHONPATH"
