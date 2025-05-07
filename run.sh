@@ -6,7 +6,7 @@ VENV_DIR="$PROJECT_ROOT/.venv"
 
 source "$VENV_DIR/bin/activate"
 
-cd "$PROJECT_ROOT/Codebase/FastAPIapp"
+cd "$PROJECT_ROOT/Codebase"
 export PYTHONPATH=".:$PYTHONPATH"
 
 echo "Running FastAPI from $(pwd)"
