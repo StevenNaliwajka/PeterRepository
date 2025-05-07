@@ -22,7 +22,7 @@ if [[ "$setup_systemd" == "y" || "$setup_systemd" == "Y" ]]; then
 
     echo "Creating systemd service at $SERVICE_FILE"
 
-    sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+    $sudo tee "$SERVICE_FILE" > /dev/null <<EOF
 [Unit]
 Description=Peter Repo FastAPI Server
 After=network.target
@@ -38,8 +38,8 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-    sudo systemctl daemon-reexec
-    sudo systemctl enable peter.service
+    $sudo systemctl daemon-reexec
+    $sudo systemctl enable peter.service
     echo "Systemd service enabled! It will run on boot."
 else
     echo "Skipping systemd setup."

@@ -10,15 +10,25 @@ REQUIREMENTS_FILE="$SCRIPT_DIR/requirements.txt"
 APT_CMD="apt install -y"
 
 # Only use sudo if not root
-if [ "$(id -u)" -ne 0 ]; then
-  APT_CMD="sudo $APT_CMD"
+# Use sudo only if not running as root
+if [ "$(id -u)" -eq 0 ]; then
+  SUDO=""
+else
+  SUDO="sudo"
 fi
+
 
 # Check and install python3
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 not found, installing..."
   apt update && $APT_CMD python3
+fi# Use sudo only if not running as root
+if [ "$(id -u)" -eq 0 ]; then
+  SUDO=""
+else
+  SUDO="sudo"
 fi
+
 
 # Check and install python3-venv
 if ! python3 -m venv --help >/dev/null 2>&1; then
