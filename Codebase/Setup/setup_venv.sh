@@ -9,46 +9,38 @@ REQUIREMENTS_FILE="$SCRIPT_DIR/requirements.txt"
 
 APT_CMD="apt install -y"
 
-# Only use sudo if not root
-# Use sudo only if not running as root
+# Only use sudo if not running as root
 if [ "$(id -u)" -eq 0 ]; then
   SUDO=""
 else
   SUDO="sudo"
 fi
-
 
 # Check and install python3
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 not found, installing..."
-  apt update && $APT_CMD python3
-fi# Use sudo only if not running as root
-if [ "$(id -u)" -eq 0 ]; then
-  SUDO=""
-else
-  SUDO="sudo"
+  apt update && $SUDO $APT_CMD python3
 fi
-
 
 # Check and install python3-venv
 if ! python3 -m venv --help >/dev/null 2>&1; then
   echo "python3-venv not found, installing..."
-  $APT_CMD python3-venv
+  $SUDO $APT_CMD python3-venv
 fi
 
 # Check and install pip3
 if ! command -v pip3 >/dev/null 2>&1; then
   echo "pip3 not found, installing..."
-  $APT_CMD python3-pip
+  $SUDO $APT_CMD python3-pip
 fi
 
 # Recreate virtual environment (forcefully)
 if [ -d "$VENV_DIR" ]; then
-  echo "[!] Removing existing virtual environment at: $VENV_DIR"
+  echo "Removing existing virtual environment at: $VENV_DIR"
   rm -rf "$VENV_DIR"
 fi
 
-echo "[+] Creating new virtual environment at: $VENV_DIR"
+echo "Creating new virtual environment at: $VENV_DIR"
 python3 -m venv "$VENV_DIR"
 
 # Activate and install dependencies
