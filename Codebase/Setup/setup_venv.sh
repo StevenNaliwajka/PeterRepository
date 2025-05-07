@@ -34,6 +34,16 @@ if ! command -v pip3 >/dev/null 2>&1; then
   $SUDO $APT_CMD python3-pip
 fi
 
+# Detect active python version (e.g., 3.11)
+PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+
+# Ensure venv support for that Python version
+if ! python3 -m venv --help >/dev/null 2>&1; then
+  echo "python3-venv for Python $PY_VER not found, installing python$PY_VER-venv..."
+  $SUDO apt install -y python$PY_VER-venv
+fi
+
+
 # Recreate virtual environment (forcefully)
 if [ -d "$VENV_DIR" ]; then
   echo "Removing existing virtual environment at: $VENV_DIR"
