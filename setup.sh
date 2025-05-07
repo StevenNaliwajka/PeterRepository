@@ -2,6 +2,14 @@
 
 echo "Welcome to Peter Repo Setup"
 
+# Determine sudo usage
+if [ "$(id -u)" -eq 0 ]; then
+    SUDO=""
+else
+    SUDO="sudo"
+fi
+
+
 # Setup Configs
 bash Codebase/Setup/create_config.sh
 bash Codebase/Setup/create_pathing_config.sh
@@ -19,31 +27,36 @@ read -p "Do you want to run the app on startup using systemctl? (y/n): " setup_s
 
 if [[ "$setup_systemd" == "y" || "$setup_systemd" == "Y" ]]; then
     SERVICE_FILE="/etc/systemd/system/peter.service"
+    CURRENT_USER=$(logname)  # Get the actual user running the script
+    WORKING_DIR="$(pwd)"
+    RUN_SCRIPT="$WORKING_DIR/run.sh"
 
     echo "Creating systemd service at $SERVICE_FILE"
 
-    $sudo tee "$SERVICE_FILE" > /dev/null <<EOF
+    $SUDO bash -c "cat > $SERVICE_FILE" <<EOF
 [Unit]
 Description=Peter Repo FastAPI Server
 After=network.target
 
 [Service]
 Type=simple
-User=$USER
-WorkingDirectory=$(pwd)
-ExecStart=$(pwd)/run.sh
+User=$CURRENT_USER
+WorkingDirectory=$WORKING_DIR
+ExecStart=$RUN_SCRIPT
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-    $sudo systemctl daemon-reexec
-    $sudo systemctl enable peter.service
-    echo "Systemd service enabled! It will run on boot."
+    $SUDO systemctl daemon-reload
+    $SUDO systemctl enable peter.service
+    $SUDO systemctl start peter.service
+    echo "Systemd service enabled and started! It will run on boot."
 else
     echo "Skipping systemd setup."
 fi
+
 
 echo ""
 echo "Setup complete!"
