@@ -32,13 +32,14 @@ if ! command -v pip3 >/dev/null 2>&1; then
   $APT_CMD python3-pip
 fi
 
-# Create virtual environment
-if [ ! -d "$VENV_DIR" ]; then
-  echo "Creating virtual environment at: $VENV_DIR"
-  python3 -m venv "$VENV_DIR"
-else
-  echo "Virtual environment already exists at: $VENV_DIR"
+# Recreate virtual environment (forcefully)
+if [ -d "$VENV_DIR" ]; then
+  echo "[!] Removing existing virtual environment at: $VENV_DIR"
+  rm -rf "$VENV_DIR"
 fi
+
+echo "[+] Creating new virtual environment at: $VENV_DIR"
+python3 -m venv "$VENV_DIR"
 
 # Activate and install dependencies
 if [ -f "$VENV_DIR/bin/activate" ]; then
