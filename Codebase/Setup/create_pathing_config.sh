@@ -1,18 +1,42 @@
 #!/bin/bash
 
 # Get absolute path two levels up
-TARGET_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/Config"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TARGET_DIR="$(realpath "$SCRIPT_DIR/../..")/Config"
+DEFAULT_REPO_GIF_PATH="$(realpath "$SCRIPT_DIR/../..")/GIFs"
 
-# Ensure the target config directory exists
+# Ensure the config directory exists
 mkdir -p "$TARGET_DIR"
 
-# Define the JSON content
-read -r -d '' JSON_CONTENT << 'EOF'
-GIF_BASE_PATH=GIFs
-GIF_BASE_URL=/static/gifs
-EOF
+echo "Choose where to store GIFs:"
+echo "1) Inside the repo (default): $DEFAULT_REPO_GIF_PATH"
+echo "2) Custom local path"
+echo "3) Network-mounted path (e.g., /mnt/nas/gifs)"
+read -rp "Enter option [1-3]: " option
 
-# Write the JSON to the target path
-echo "$JSON_CONTENT" > "$TARGET_DIR/gif_pathing.env"
+case "$option" in
+  2)
+    read -rp "Enter full local path: " custom_path
+    GIF_PATH="$custom_path"
+    ;;
+  3)
+    read -rp "Enter full network-mounted path: " network_path
+    GIF_PATH="$network_path"
+    ;;
+  *)
+    GIF_PATH="$DEFAULT_REPO_GIF_PATH"
+    ;;
+esac
 
-echo "Created $TARGET_DIR/gif_pathing.env"
+# Convert to relative URL path for FastAPI use
+GIF_BASE_URL="/static/gifs"
+
+# Write .env config
+{
+  echo "GIF_BASE_PATH=$GIF_PATH"
+  echo "GIF_BASE_URL=$GIF_BASE_URL"
+} > "$TARGET_DIR/gif_pathing.env"
+
+echo "Created $TARGET_DIR/gif_pathing.env with:"
+echo "GIF_BASE_PATH=$GIF_PATH"
+echo "GIF_BASE_URL=$GIF_BASE_URL"
