@@ -68,6 +68,22 @@ class DailyGif:
         base_url = f"{web_prefix}/{selected}"
         return f"{base_url}?v={uuid4().hex}"
 
+    def get_random_gif_path(self):
+        folder = self._determine_folder()
+        local_path = os.path.join(self.base_path, folder)
+
+        try:
+            gif_files = [f for f in os.listdir(local_path) if f.endswith(".gif")]
+        except FileNotFoundError:
+            raise FileNotFoundError(f"GIF folder not found: {local_path}")
+
+        if not gif_files:
+            raise FileNotFoundError(f"No .gif files found in: {local_path}")
+
+        selected = random.choice(gif_files)
+        return os.path.join(local_path, selected)
+
+
     def reset_cache(self):
         self.cached_date = None
         self.cached_folder = None
