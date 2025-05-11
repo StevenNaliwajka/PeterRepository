@@ -41,6 +41,6 @@ source "$VENV_DIR/bin/activate"
 cd "$PROJECT_ROOT/Codebase"
 export PYTHONPATH=".:$PYTHONPATH"
 
-# Start the app
+# Start the app (non-blocking or wait-friendly)
 echo "Running FastAPI from $(pwd)"
-exec uvicorn main:app --host 0.0.0.0 --port $APP_PORT
+uvicorn main:app --host 0.0.0.0 --port "$APP_PORT"
