@@ -43,4 +43,4 @@ export PYTHONPATH=".:$PYTHONPATH"
 
 # Start the app (non-blocking or wait-friendly)
 echo "Running FastAPI from $(pwd)"
-uvicorn main:app --host 0.0.0.0 --port "$APP_PORT"
+exec uvicorn main:app --host 0.0.0.0 --port 8000
