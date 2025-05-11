@@ -19,6 +19,7 @@ bash Codebase/Setup/install_python.sh
 # Create VENV and install requirements
 bash Codebase/Setup/setup_venv.sh
 
+# Create necessary folder
 mkdir -p Codebase/FastAPIapp
 
 # Ensure run.sh is executable
@@ -27,39 +28,8 @@ chmod +x "$(pwd)/run.sh"
 echo ""
 read -p "Do you want to run the app on startup using systemctl? (y/n): " setup_systemd
 
-if [[ "$setup_systemd" == "y" || "$setup_systemd" == "Y" ]]; then
-    SERVICE_FILE="/etc/systemd/system/peter.service"
-    CURRENT_USER=$(whoami)
-    WORKING_DIR="$(pwd)"
-    RUN_SCRIPT="$WORKING_DIR/run.sh"
-
-    echo "Creating systemd service at $SERVICE_FILE"
-
-    $SUDO bash -c "cat > $SERVICE_FILE" <<EOF
-[Unit]
-Description=Peter Repo FastAPI Server
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/root/PeterRepository
-ExecStart=/bin/bash /root/PeterRepository/run.sh
-Restart=always
-RestartSec=3
-StandardOutput=append:/var/log/peter.log
-StandardError=append:/var/log/peter.err
-Environment=PYTHONUNBUFFERED=1
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-    $SUDO systemctl daemon-reload
-    $SUDO systemctl enable peter.service
-    $SUDO systemctl start peter.service
-    echo "Systemd service enabled and started! It will run on boot."
+if [[ "$setup_systemd" =~ ^[Yy]$ ]]; then
+    bash Codebase/Setup/setup_systemd.sh
 else
     echo "Skipping systemd setup."
 fi

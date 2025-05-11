@@ -4,6 +4,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$SCRIPT_DIR"
 VENV_DIR="$PROJECT_ROOT/.venv"
 APP_PORT=8000
+MOUNT_SCRIPT="$PROJECT_ROOT/Codebase/Setup/mount_nas.sh"
+
+# Run NAS mount script
+echo "Mounting NAS if needed..."
+bash "$MOUNT_SCRIPT" || {
+  echo "[ERROR] Failed to mount NAS. Exiting."
+  exit 1
+}
 
 # Kill any process using the target port (likely a previous run of this app)
 echo "Checking for existing process on port $APP_PORT..."

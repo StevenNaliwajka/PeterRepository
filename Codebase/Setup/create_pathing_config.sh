@@ -22,6 +22,12 @@ case "$option" in
   3)
     read -rp "Enter full network-mounted path: " network_path
     GIF_PATH="$network_path"
+
+    # Prompt for NAS config variables
+    read -rp "Enter NAS share path (e.g., //192.168.31.2/peter): " NAS_SHARE
+    read -rp "Enter NAS username: " NAS_USERNAME
+    read -rp "Enter NAS password: " NAS_PASSWORD
+    read -rp "Enter SMB version (e.g., 1.0 or 3.0): " NAS_VERSION
     ;;
   *)
     GIF_PATH="$DEFAULT_REPO_GIF_PATH"
@@ -35,8 +41,12 @@ GIF_BASE_URL="/static/gifs"
 {
   echo "GIF_BASE_PATH=$GIF_PATH"
   echo "GIF_BASE_URL=$GIF_BASE_URL"
+  [[ "$option" == "3" ]] && echo "NAS_SHARE=$NAS_SHARE"
+  [[ "$option" == "3" ]] && echo "NAS_USERNAME=$NAS_USERNAME"
+  [[ "$option" == "3" ]] && echo "NAS_PASSWORD=$NAS_PASSWORD"
+  [[ "$option" == "3" ]] && echo "NAS_VERSION=$NAS_VERSION"
 } > "$TARGET_DIR/gif_pathing.env"
 
+echo
 echo "Created $TARGET_DIR/gif_pathing.env with:"
-echo "GIF_BASE_PATH=$GIF_PATH"
-echo "GIF_BASE_URL=$GIF_BASE_URL"
+cat "$TARGET_DIR/gif_pathing.env"
