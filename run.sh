@@ -19,10 +19,17 @@ PID_TO_KILL=$(lsof -ti tcp:$APP_PORT)
 
 if [ -n "$PID_TO_KILL" ]; then
   echo "Killing process on port $APP_PORT (PID: $PID_TO_KILL)..."
-  kill "$PID_TO_KILL" || {
+  if kill "$PID_TO_KILL"; then
+    echo "Gracefully killed PID $PID_TO_KILL."
+  else
     echo "Force killing PID $PID_TO_KILL..."
-    kill -9 "$PID_TO_KILL"
-  }
+    if kill -9 "$PID_TO_KILL"; then
+      echo "Successfully force-killed PID $PID_TO_KILL."
+    else
+      echo "[ERROR] Failed to kill process on port $APP_PORT. Exiting."
+      exit 1
+    fi
+  fi
 else
   echo "No process currently using port $APP_PORT."
 fi
