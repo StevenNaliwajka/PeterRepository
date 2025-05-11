@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse, Response, FileResponse
+from starlette.responses import Response as StarletteResponse
 from fastapi.staticfiles import StaticFiles
 from daily_gif import DailyGif
 from dotenv import dotenv_values
@@ -47,7 +48,15 @@ async def serve_family_guy_gif():
     try:
         gif_path = gif_picker.get_random_gif_path()
         logger.info(f"Serving GIF file: {gif_path}")
-        return FileResponse(gif_path, media_type="image/gif")
+        return FileResponse(
+            gif_path,
+            media_type="image/gif",
+            headers={
+                "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+                "Pragma": "no-cache",
+                "Expires": "0"
+            }
+        )
     except Exception as e:
         logger.error(f"Error serving GIF: {e}")
         raise HTTPException(status_code=500, detail=str(e))
