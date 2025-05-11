@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -15,14 +14,23 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 gif_picker = DailyGif()
 
+# Load .env config
 env_path = Path(__file__).resolve().parent.parent / "Config" / "gif_pathing.env"
 config = dotenv_values(env_path)
 
-gif_static_dir = Path(config.get("GIF_BASE_PATH")).resolve()
+# Validate GIF_BASE_PATH
+gif_base_path = config.get("GIF_BASE_PATH")
+if not gif_base_path:
+    logger.error("GIF_BASE_PATH not set in environment config.")
+    raise RuntimeError("Missing GIF_BASE_PATH in config")
+
+gif_static_dir = Path(gif_base_path)
+if not gif_static_dir.exists():
+    logger.error(f"GIF_BASE_PATH directory does not exist: {gif_static_dir}")
+    raise RuntimeError(f"Directory not found: {gif_static_dir}")
+
+# Mount static GIFs folder
 app.mount("/static/gifs", StaticFiles(directory=gif_static_dir), name="gifs")
-
-
-
 
 @app.get("/favicon.ico")
 def favicon():
