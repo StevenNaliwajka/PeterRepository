@@ -7,6 +7,7 @@ from starlette.responses import Response as StarletteResponse
 from fastapi.staticfiles import StaticFiles
 from daily_gif import DailyGif
 from dotenv import dotenv_values
+from uuid import uuid4
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +55,6 @@ async def serve_family_guy_gif():
                 "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
                 "Pragma": "no-cache",
                 "Expires": "0",
-                # 👇 Serve it like it's always a different file
                 "Content-Disposition": f'inline; filename="{uuid4().hex}.gif"'
             }
         )
