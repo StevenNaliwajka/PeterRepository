@@ -45,3 +45,7 @@ async def serve_family_guy_gif():
     except Exception as e:
         logger.error(f"Error serving GIF: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("[DEBUG] FastAPI shutdown event triggered.")
