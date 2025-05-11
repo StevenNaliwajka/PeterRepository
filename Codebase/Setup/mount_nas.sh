@@ -33,9 +33,18 @@ if [ ! -d "$MOUNT_PATH" ]; then
   sudo mkdir -p "$MOUNT_PATH"
 fi
 
+# Check if NAS is already mounted
+if mount | grep -q "on $MOUNT_PATH type cifs"; then
+  echo "[INFO] NAS already mounted at $MOUNT_PATH"
+  exit 0
+fi
+
 # Mount the NAS
 echo "[INFO] Mounting NAS share $NAS_SHARE to $MOUNT_PATH"
-sudo mount -t cifs "$NAS_SHARE" "$MOUNT_PATH" \
-  -o username="$NAS_USERNAME",password="$NAS_PASSWORD",vers="$NAS_VERSION",uid=0,gid=0
+if ! sudo mount -t cifs "$NAS_SHARE" "$MOUNT_PATH" \
+  -o username="$NAS_USERNAME",password="$NAS_PASSWORD",vers="$NAS_VERSION",uid=0,gid=0; then
+  echo "[ERROR] Failed to mount NAS. Exiting."
+  exit 1
+fi
 
 echo "[SUCCESS] NAS mounted at $MOUNT_PATH"
