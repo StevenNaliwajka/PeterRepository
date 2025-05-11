@@ -12,7 +12,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-gif_picker = DailyGif()
+try:
+    gif_picker = DailyGif()
+except Exception as e:
+    logger.exception("Error initializing DailyGif")
+    raise
+
 
 # Load .env config
 env_path = Path(__file__).resolve().parent.parent / "Config" / "gif_pathing.env"
