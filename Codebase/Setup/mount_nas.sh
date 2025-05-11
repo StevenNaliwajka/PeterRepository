@@ -33,10 +33,19 @@ if [ ! -d "$MOUNT_PATH" ]; then
   sudo mkdir -p "$MOUNT_PATH"
 fi
 
-# Check if NAS is already mounted
-if mount | grep -q "on $MOUNT_PATH type cifs"; then
+# Check if NAS is already mounted (valid mount point)
+if mountpoint -q "$MOUNT_PATH"; then
   echo "[INFO] NAS already mounted at $MOUNT_PATH"
   exit 0
+fi
+
+# Clean up potential stale mount
+if mount | grep -q "$MOUNT_PATH"; then
+  echo "[WARN] Stale mount detected at $MOUNT_PATH. Attempting to unmount..."
+  sudo umount -f "$MOUNT_PATH" || {
+    echo "[ERROR] Failed to unmount stale mount at $MOUNT_PATH"
+    exit 1
+  }
 fi
 
 # Mount the NAS
