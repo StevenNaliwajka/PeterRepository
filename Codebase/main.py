@@ -41,7 +41,7 @@ app.mount("/static/gifs", StaticFiles(directory=gif_static_dir), name="gifs")
 def favicon():
     return Response(status_code=204)  # No content, just suppress browser 404
 
-@app.get("/")
+@app.get("/peter")
 async def serve_family_guy_gif():
     try:
         gif_url = gif_picker.get_random_gif_url()
