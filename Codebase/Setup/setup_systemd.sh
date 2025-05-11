@@ -24,16 +24,18 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=$WORKING_DIR
-ExecStart=/bin/bash $RUN_SCRIPT
-Restart=always
+ExecStart=$RUN_SCRIPT
+Restart=on-failure
 RestartSec=3
 StandardOutput=append:/var/log/peter.log
 StandardError=append:/var/log/peter.err
+KillSignal=SIGINT
 Environment=PYTHONUNBUFFERED=1
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
 
 $SUDO systemctl daemon-reload
 $SUDO systemctl enable peter.service
