@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import RedirectResponse, Response, FileResponse
+from fastapi.responses import RedirectResponse, Response, FileResponse, StreamingResponse
 from starlette.responses import Response as StarletteResponse
 from fastapi.staticfiles import StaticFiles
 from daily_gif import DailyGif
@@ -42,24 +42,26 @@ app.mount("/static/gifs", StaticFiles(directory=gif_static_dir), name="gifs")
 def favicon():
     return Response(status_code=204)  # No content, just suppress browser 404
 
-
 @app.get("/peter")
 async def serve_family_guy_gif():
     try:
         gif_path = gif_picker.get_random_gif_path()
-        logger.info(f"Serving GIF file: {gif_path}")
-        return FileResponse(
-            gif_path,
+        logger.info(f"Streaming GIF file: {gif_path}")
+        return StreamingResponse(
+            open(gif_path, mode="rb"),
             media_type="image/gif",
             headers={
                 "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
                 "Pragma": "no-cache",
-                "Expires": "0"
+                "Expires": "0",
+                # 👇 Serve it like it's always a different file
+                "Content-Disposition": f'inline; filename="{uuid4().hex}.gif"'
             }
         )
     except Exception as e:
-        logger.error(f"Error serving GIF: {e}")
+        logger.error(f"Error streaming GIF: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.on_event("shutdown")
