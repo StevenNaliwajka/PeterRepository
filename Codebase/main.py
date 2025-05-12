@@ -95,7 +95,7 @@ def static_peter_updater():
             logger.info(f"[staticpeter] Updated: {src_gif} -> {dest}")
         except Exception as e:
             logger.error(f"[staticpeter] Failed to update: {e}")
-        time.sleep(5)
+        time.sleep(60)
 
 
 @app.on_event("startup")
